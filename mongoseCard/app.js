@@ -12,9 +12,19 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 app.get('/read', async (req, res) => {
-  let allusers = await User.find({});
+  let users = await User.find({});
   
-  res.render('read',{users: allusers});
+  res.render('read',{users});
+
+});
+app.get('/edit/:userid', async (req, res) => {
+  let user = await User.findOne({_id: req.params.userid });
+  res.render('edit',{user});
+});
+app.get('/delete/:id', async (req, res) => {
+  let users = await User.findOneAndDelete({_id:req.params.id});
+  
+  res.redirect('/read');
 });
 
 app.post('/create', async (req, res) => {
