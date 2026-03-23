@@ -1,8 +1,41 @@
 const express = require('express');
 const app = express();
+const User = require('./models/user');
+const postModel = require('./models/posts');
+const cookieParser = require('cookie-parser');
+const bycrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+
+app.set('view engine', 'ejs');
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.get('/', (req, res) => {
-  res.send('Hello, World!');
+  res.render('index');
+});
+
+app.post('/register', async (req, res) => {
+  let { email, password, username, name, age } = req.body;
+  let user = await userModel.findOne({ email });
+  if (user) return res.status(500).send("user already exists");
+
+  bycrypt.genSalt(10, (err, salt) => {
+    bycrypt.hash(password, salt,async (err, hash) => {
+  await userModel.create({
+    username,
+    name,
+    age,
+    email,
+    password: hash
+  })
+  let token=jwt.sign({email:email,userid:user._id},"secretkey")
+  res.cookie("token",token);
+  res.send("registration successful");
+
+    })
+  })
 });
 
 app.listen(3000);
